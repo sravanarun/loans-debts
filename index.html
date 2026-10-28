@@ -439,6 +439,90 @@
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Tenure (Months / EMIs) *</label>
             <input type="number" id="loanTenure" required min="1" oninput="autoCalculateEMI()" placeholder="6" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
+        </div>
+
+        <!-- Row 4: EMI Amount, Due Day & Start Date -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Monthly EMI Amount *</label>
+            <div class="relative">
+              <span class="absolute left-3 top-2 text-xs font-bold text-slate-400 currencySymbol">₹</span>
+              <input type="number" step="any" id="loanEMI" required placeholder="Auto or custom" class="w-full text-xs pl-7 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1">Calculated automatically (editable)</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">EMI Repayment Day *</label>
+            <div class="relative">
+              <input type="number" min="1" max="31" id="loanDueDay" required placeholder="5" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
+              <span class="absolute right-3 top-2 text-xs text-slate-400 font-medium">th of month</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Disbursed / Start Date *</label>
+            <input type="date" id="loanStartDate" required class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+        </div>
+
+        <!-- Row 5: Installments Already Paid & Status -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Installments Already Paid (if existing loan)</label>
+            <input type="number" min="0" id="loanPaidCount" value="0" placeholder="0" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
+            <p class="text-[10px] text-slate-400 mt-1">Counts towards historical repaid principal</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Loan Status</label>
+            <select id="loanStatus" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
+              <option value="ACTIVE" selected>ACTIVE (Ongoing)</option>
+              <option value="CLOSED">CLOSED (Completed / Settled)</option>
+              <option value="FORECLOSED">FORECLOSED (Early Settlement)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Row 6: Notes / Remarks -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Notes / Tags (Optional)</label>
+          <input type="text" id="loanNotes" placeholder="e.g. Shopping EMI, Auto-debit via NACH, Prepayment planned" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <!-- Quick Lender Shortcuts -->
+        <div class="pt-1">
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Quick Select Lender</span>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" onclick="setPresetLender('Pocketly', 'FLAT', 24)" class="px-2.5 py-1 text-[11px] rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 font-medium border border-slate-200 dark:border-slate-700">Pocketly</button>
+            <button type="button" onclick="setPresetLender('KreditBee', 'REDUCING', 21)" class="px-2.5 py-1 text-[11px] rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 font-medium border border-slate-200 dark:border-slate-700">KreditBee</button>
+            <button type="button" onclick="setPresetLender('Snapmint', 'FLAT', 18)" class="px-2.5 py-1 text-[11px] rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 font-medium border border-slate-200 dark:border-slate-700">Snapmint</button>
+            <button type="button" onclick="setPresetLender('MoneyView', 'REDUCING', 19.5)" class="px-2.5 py-1 text-[11px] rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 font-medium border border-slate-200 dark:border-slate-700">MoneyView</button>
+            <button type="button" onclick="setPresetLender('Navi', 'REDUCING', 14)" class="px-2.5 py-1 text-[11px] rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 font-medium border border-slate-200 dark:border-slate-700">Navi</button>
+            <button type="button" onclick="setPresetLender('Bajaj Finserv', 'REDUCING', 15)" class="px-2.5 py-1 text-[11px] rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 font-medium border border-slate-200 dark:border-slate-700">Bajaj Finserv</button>
+            <button type="button" onclick="setPresetLender('Bank Personal Loan', 'REDUCING', 11.5)" class="px-2.5 py-1 text-[11px] rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 font-medium border border-slate-200 dark:border-slate-700">Bank Loan</button>
+          </div>
+        </div>
+
+        <!-- Sticky Form Footer with Save & Cancel Buttons -->
+        <div class="sticky -bottom-6 mt-6 -mx-6 -mb-6 px-6 py-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-t border-slate-200 dark:border-slate-800 flex items-center justify-between z-20">
+          <div class="text-[11px] text-slate-500 hidden sm:block">
+            Tip: Press <kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono text-[10px]">Ctrl</kbd> + <kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono text-[10px]">Enter</kbd> to save
+          </div>
+          <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <button type="button" onclick="closeLoanModal()" class="w-1/2 sm:w-auto px-4 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+              Cancel
+            </button>
+            <button type="submit" id="saveLoanBtn" class="w-1/2 sm:w-auto px-6 py-2.5 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-check"></i>
+              <span id="saveBtnText">Save Loan</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Close / Foreclose Loan Modal -->
   <div id="closeLoanModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-850 dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md p-6">
@@ -1508,12 +1592,12 @@
           data: {
             labels: next12Labels,
             datasets: [{
-              label: 'Monthly Repayment Outflow',
+              label: 'Projected Monthly Outflow',
               data: monthlyOutflows,
               borderColor: '#10b981',
               backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              fill: true,
               tension: 0.35,
+              fill: true,
               pointBackgroundColor: '#10b981',
               pointRadius: 4
             }]
@@ -1525,17 +1609,173 @@
               legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (ctx) => ` Obligation: ${formatMoney(ctx.parsed.y)}`
+                  label: (ctx) => ` Outflow: ${formatMoney(ctx.parsed.y)}`
                 }
               }
             },
             scales: {
-              x: { ticks: { color: textColor, font: { size: 11 } }, grid: { display: false } },
-              y: { ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor } }
+              x: { ticks: { color: textColor, font: { size: 10 } }, grid: { display: false } },
+              y: { 
+                ticks: { 
+                  color: textColor, 
+                  font: { size: 10 },
+                  callback: (val) => formatMoney(val)
+                }, 
+                grid: { color: gridColor },
+                beginAtZero: true
+              }
             }
           }
         });
       }
+    }
+
+    // Render 2: Detailed Table View
+    function renderTableView(loanList) {
+      const tbody = document.getElementById('loanTableBody');
+      tbody.innerHTML = '';
+
+      loanList.forEach(loan => {
+        const stats = calculateLoanAmortization(loan);
+        const isClosed = loan.status === 'CLOSED' || loan.status === 'FORECLOSED';
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-750/50 transition';
+
+        tr.innerHTML = `
+          <td class="py-3 px-4">
+            <div class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full ${isClosed ? 'bg-emerald-500' : 'bg-indigo-500'}"></span>
+              ${escapeHtml(loan.lender)}
+            </div>
+            <div class="text-[10px] text-slate-400 font-mono">${escapeHtml(loan.ref || 'No Ref')}</div>
+          </td>
+          <td class="py-3 px-3 font-semibold">${formatMoney(loan.principal)}</td>
+          <td class="py-3 px-3 font-semibold text-emerald-600 dark:text-emerald-400">${formatMoney(loan.disbursed || loan.principal)}</td>
+          <td class="py-3 px-3 font-semibold text-rose-500">${formatMoney(loan.upfrontFees || 0)}</td>
+          <td class="py-3 px-3 font-semibold">${loan.rate}% <span class="text-[10px] text-slate-400 font-normal">(${loan.interestType === 'FLAT' ? 'Flat' : 'Red.'})</span></td>
+          <td class="py-3 px-3 font-bold text-indigo-600 dark:text-indigo-400">${isClosed ? '—' : formatMoney(loan.emi)}</td>
+          <td class="py-3 px-3">${isClosed ? '—' : `${loan.dueDay}th`}</td>
+          <td class="py-3 px-3">
+            <div class="font-bold ${isClosed ? 'text-emerald-600' : 'text-slate-900 dark:text-white'}">
+              ${isClosed ? '₹0' : formatMoney(stats.remainingBalance)}
+            </div>
+            <div class="text-[10px] text-slate-400">${formatMoney(stats.principalRepaid)} paid</div>
+          </td>
+          <td class="py-3 px-3">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
+              isClosed
+                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-400'
+            }">
+              ${loan.status}
+            </span>
+          </td>
+          <td class="py-3 px-4 text-right">
+            <div class="flex items-center justify-end gap-1.5">
+              <button onclick="openLedgerModal('${loan.id}')" title="Schedule" class="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">
+                <i class="fa-solid fa-list-ul"></i>
+              </button>
+              <button onclick="editLoan('${loan.id}')" title="Edit" class="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button onclick="deleteLoan('${loan.id}')" title="Delete" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Render 4: EMI Due Calendar Timeline View
+    function renderCalendarView(loanList) {
+      const container = document.getElementById('calendarTimeline');
+      const activeOnly = loanList.filter(l => l.status === 'ACTIVE');
+      container.innerHTML = '';
+
+      if (activeOnly.length === 0) {
+        container.innerHTML = `
+          <div class="py-8 text-center text-slate-400 text-xs">
+            No active EMIs scheduled for this month.
+          </div>
+        `;
+        document.getElementById('calendarTotalDueBadge').textContent = 'Total Due: ₹0';
+        return;
+      }
+
+      // Sort by due day ascending
+      const sorted = [...activeOnly].sort((a, b) => (Number(a.dueDay) || 1) - (Number(b.dueDay) || 1));
+      let totalDueMonth = 0;
+
+      const today = new Date().getDate();
+
+      sorted.forEach(loan => {
+        totalDueMonth += Number(loan.emi) || 0;
+        const day = Number(loan.dueDay) || 1;
+        const isPast = day < today;
+        const isToday = day === today;
+
+        const row = document.createElement('div');
+        row.className = `p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${
+          isToday 
+            ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800' 
+            : isPast 
+            ? 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-75' 
+            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'
+        }`;
+
+        row.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl flex flex-col items-center justify-center font-bold text-center ${
+              isToday 
+                ? 'bg-amber-500 text-white' 
+                : isPast 
+                ? 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300' 
+                : 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
+            }">
+              <span class="text-[9px] uppercase tracking-wider font-semibold">DAY</span>
+              <span class="text-base leading-none font-black">${day}</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-sm text-slate-900 dark:text-white">${escapeHtml(loan.lender)}</h4>
+                ${
+                  isToday 
+                    ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500 text-white animate-pulse">DUE TODAY</span>' 
+                    : isPast 
+                    ? '<span class="text-[10px] font-semibold text-slate-400">Past this month</span>' 
+                    : '<span class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">Upcoming</span>'
+                }
+              </div>
+              <div class="text-[11px] text-slate-400 font-mono mt-0.5">${escapeHtml(loan.ref || 'Direct debit / App')} • Interest: ${loan.rate}%</div>
+            </div>
+          </div>
+
+          <div class="text-right">
+            <div class="text-base font-extrabold text-slate-900 dark:text-white">${formatMoney(loan.emi)}</div>
+            <button onclick="openLedgerModal('${loan.id}')" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+              View Schedule →
+            </button>
+          </div>
+        `;
+
+        container.appendChild(row);
+      });
+
+      document.getElementById('calendarTotalDueBadge').textContent = `Total Due: ${formatMoney(totalDueMonth)}`;
+    }
+
+    // Quick Preset Lender Selector
+    function setPresetLender(name, type, defaultRate) {
+      document.getElementById('loanLender').value = name;
+      document.getElementById('loanInterestType').value = type;
+      if (!document.getElementById('loanRate').value) {
+        document.getElementById('loanRate').value = defaultRate;
+      }
+      autoCalculateEMI(true);
     }
 
     // Modal Operations: Add / Edit Loan
@@ -1548,8 +1788,11 @@
         document.getElementById('loanForm').reset();
         document.getElementById('loanId').value = '';
         document.getElementById('modalTitle').textContent = 'Add New Loan / Credit';
+        document.getElementById('saveBtnText').textContent = 'Save Loan';
         document.getElementById('loanStartDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('loanDueDay').value = new Date().getDate();
+        document.getElementById('loanPaidCount').value = 0;
+        document.getElementById('loanStatus').value = 'ACTIVE';
       }
     }
 
@@ -1577,8 +1820,10 @@
       document.getElementById('loanStartDate').value = loan.startDate || new Date().toISOString().split('T')[0];
       document.getElementById('loanNotes').value = loan.notes || '';
       document.getElementById('loanStatus').value = loan.status || 'ACTIVE';
+      document.getElementById('loanPaidCount').value = loan.paidInstallments || 0;
 
       document.getElementById('modalTitle').textContent = `Edit ${loan.lender} Details`;
+      document.getElementById('saveBtnText').textContent = 'Update Loan';
       openLoanModal(true);
     }
 
@@ -1588,6 +1833,7 @@
       const principal = parseFloat(document.getElementById('loanPrincipal').value);
       const disbursed = parseFloat(document.getElementById('loanDisbursed').value) || principal;
       let upfrontFees = parseFloat(document.getElementById('loanUpfrontFees').value);
+      const paidCount = parseInt(document.getElementById('loanPaidCount').value) || 0;
 
       if (isNaN(upfrontFees)) {
         upfrontFees = Math.max(0, principal - disbursed);
@@ -1608,29 +1854,46 @@
         startDate: document.getElementById('loanStartDate').value,
         notes: document.getElementById('loanNotes').value.trim(),
         status: document.getElementById('loanStatus').value,
-        paidInstallments: 0,
+        paidInstallments: paidCount,
         prepayments: 0
       };
 
       if (id) {
-        // preserve previous payments on edit
+        // preserve previous prepayments on edit unless modified
         const existing = loans.find(l => l.id === id);
         if (existing) {
-          loanData.paidInstallments = existing.paidInstallments || 0;
           loanData.prepayments = existing.prepayments || 0;
+          if (existing.closedDate && loanData.status === 'CLOSED') {
+            loanData.closedDate = existing.closedDate;
+          }
         }
         const index = loans.findIndex(l => l.id === id);
         loans[index] = loanData;
-        showToast('Loan updated successfully');
+        showToast(`Updated "${loanData.lender}" details successfully!`, 'circle-check');
       } else {
         loans.push(loanData);
-        showToast('New loan added to tracker');
+        showToast(`New loan "${loanData.lender}" saved to tracker!`, 'circle-check');
       }
 
       saveData();
       closeLoanModal();
       renderApp();
     }
+
+    // Ctrl+Enter to submit modal easily from any field
+    window.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const modal = document.getElementById('loanModal');
+        if (!modal.classList.contains('hidden')) {
+          const form = document.getElementById('loanForm');
+          if (form.checkValidity()) {
+            form.requestSubmit();
+          } else {
+            form.reportValidity();
+          }
+        }
+      }
+    });
 
     function deleteLoan(id) {
       const target = loans.find(l => l.id === id);

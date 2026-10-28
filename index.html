@@ -390,31 +390,43 @@
         <!-- Row 2: Sanctioned Principal & In-hand / Disbursed Amount -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-indigo-50/40 dark:bg-indigo-950/20 p-3.5 rounded-2xl border border-indigo-100/60 dark:border-indigo-900/40">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Sanctioned Principal *</label>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Loan / Financed Amount *</label>
             <div class="relative">
               <span class="absolute left-3 top-2 text-xs font-bold text-slate-400 currencySymbol">₹</span>
-              <input type="number" step="any" id="loanPrincipal" required oninput="autoCalculateFees()" placeholder="50000" class="w-full text-xs pl-7 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
+              <input type="number" step="any" id="loanPrincipal" required oninput="autoCalculateFees()" placeholder="40000" class="w-full text-xs pl-7 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
             </div>
-            <p class="text-[10px] text-slate-400 mt-1">Total approved on agreement</p>
+            <p class="text-[10px] text-slate-400 mt-1">Amount on which EMI is calculated</p>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">In-Hand Disbursed</label>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">In-Hand Received / Item Price</label>
             <div class="relative">
               <span class="absolute left-3 top-2 text-xs font-bold text-slate-400 currencySymbol">₹</span>
-              <input type="number" step="any" id="loanDisbursed" oninput="autoCalculateFees()" placeholder="47200" class="w-full text-xs pl-7 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
+              <input type="number" step="any" id="loanDisbursed" oninput="autoCalculateFees()" placeholder="34000" class="w-full text-xs pl-7 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
             </div>
-            <p class="text-[10px] text-slate-400 mt-1">Amount credited to bank</p>
+            <p class="text-[10px] text-slate-400 mt-1">Credited to bank or item value</p>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Upfront Deductions / Fees</label>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Fee / Down Payment Amount</label>
             <div class="relative">
               <span class="absolute left-3 top-2 text-xs font-bold text-rose-500 currencySymbol">₹</span>
-              <input type="number" step="any" id="loanUpfrontFees" placeholder="2800" class="w-full text-xs pl-7 pr-3 py-2 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50/30 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 font-bold focus:ring-2 focus:ring-rose-500 outline-none">
+              <input type="number" step="any" id="loanUpfrontFees" placeholder="6000" class="w-full text-xs pl-7 pr-3 py-2 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50/30 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 font-bold focus:ring-2 focus:ring-rose-500 outline-none">
             </div>
-            <p class="text-[10px] text-slate-400 mt-1">Auto-deduced (Proc fee + GST)</p>
+            <p class="text-[10px] text-slate-400 mt-1">Deduction or initial payment</p>
           </div>
+        </div>
+
+        <!-- Fee Treatment Selection: Fixes Double-Counting -->
+        <div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200/80 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div>
+            <span class="font-bold text-slate-800 dark:text-slate-200 block">Fee / Down Payment Accounting</span>
+            <span class="text-[11px] text-slate-400">Specify whether this upfront amount was deducted or paid separately out of pocket</span>
+          </div>
+          <select id="loanFeeType" class="text-xs font-semibold py-1.5 px-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="DEDUCTED_FROM_LOAN" selected>Deducted from Loan (In-Hand = Loan - Fee)</option>
+            <option value="PAID_OUT_OF_POCKET">Paid Separately / Down Payment (Extra Outflow)</option>
+          </select>
         </div>
 
         <!-- Row 3: Interest Type, Rate & Tenure -->
@@ -956,6 +968,7 @@
       const tenure = parseInt(loan.tenure) || 1;
       const prepayments = Number(loan.prepayments) || 0;
       const upfrontFees = Number(loan.upfrontFees) || 0;
+      const feeType = loan.feeType || 'DEDUCTED_FROM_LOAN';
       const isFlat = loan.interestType === 'FLAT';
       const isClosed = loan.status === 'CLOSED' || loan.status === 'FORECLOSED';
 
@@ -1031,7 +1044,6 @@
       if (isClosed) {
         remainingBalance = 0;
         principalRepaid = principal;
-        // For closed loans, all scheduled or accrued interest is counted as paid
         interestPaidSoFar = schedule.slice(0, Math.max(paidInstallments, tenure)).reduce((acc, row) => acc + row.interest, 0);
         if (interestPaidSoFar === 0) interestPaidSoFar = totalInterest;
       } else {
@@ -1041,8 +1053,18 @@
         interestPaidSoFar = schedule.slice(0, paidInstallments).reduce((acc, row) => acc + row.interest, 0);
       }
 
-      // Real total cost = principal + total projected/actual interest + upfront charges
-      let realTotalCost = principal + (isClosed ? interestPaidSoFar : totalInterest) + upfrontFees;
+      // Real Outflow / Cost calculation:
+      // If fee was deducted from the principal (In hand = 34k, fee = 6k, loan = 40k), 
+      // the borrower repays the 40k principal + interest. Adding fee AGAIN would result in 46k (Double counting!).
+      // If fee was paid out-of-pocket / down payment over and above the loan, it is added.
+      const relevantInterest = isClosed ? interestPaidSoFar : totalInterest;
+      let realTotalCost = 0;
+      if (feeType === 'PAID_OUT_OF_POCKET') {
+        realTotalCost = principal + relevantInterest + upfrontFees;
+      } else {
+        // Deducted from loan: Principal already includes the deducted amount
+        realTotalCost = principal + relevantInterest;
+      }
 
       return {
         schedule,
@@ -1109,6 +1131,7 @@
       let totalInterestPaidLifetime = 0;
       let totalProjectedInterest = 0;
       let totalUpfrontChargesLifetime = 0;
+      let totalRealBorrowCostLifetime = 0;
       let totalMonthlyEMI = 0;
       let nextDueSummary = null;
 
@@ -1119,10 +1142,11 @@
         const stats = calculateLoanAmortization(loan);
         totalPrincipalBorrowed += Number(loan.principal) || 0;
         
-        // Upfront fees are sunk costs paid at disbursement across ALL loans (Active + Closed)
+        // Upfront fees tracked accurately
         totalUpfrontChargesLifetime += Number(loan.upfrontFees) || 0;
         totalProjectedInterest += stats.totalProjectedInterest;
         totalPrincipalPaid += stats.principalRepaid;
+        totalRealBorrowCostLifetime += stats.realTotalCost;
 
         // Interest paid includes all historical interest paid on closed loans + interest logged on active loans
         totalInterestPaidLifetime += stats.interestPaidSoFar;
@@ -1164,8 +1188,8 @@
       document.getElementById('kpiTotalProjectedInterest').textContent = `Across all active & closed loans`;
       document.getElementById('kpiUpfrontCharges').textContent = formatMoney(totalUpfrontChargesLifetime);
 
-      const realTotalLifetimeCost = totalPrincipalPaid + totalInterestPaidLifetime + totalUpfrontChargesLifetime;
-      document.getElementById('kpiRealCost').textContent = formatMoney(realTotalLifetimeCost);
+      // Real Total Borrow Cost without double counting
+      document.getElementById('kpiRealCost').textContent = formatMoney(totalRealBorrowCostLifetime);
 
       // Render Empty state if no items
       const emptyState = document.getElementById('emptyState');
@@ -1792,6 +1816,7 @@
         document.getElementById('loanStartDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('loanDueDay').value = new Date().getDate();
         document.getElementById('loanPaidCount').value = 0;
+        document.getElementById('loanFeeType').value = 'DEDUCTED_FROM_LOAN';
         document.getElementById('loanStatus').value = 'ACTIVE';
       }
     }
@@ -1812,6 +1837,7 @@
       document.getElementById('loanPrincipal').value = loan.principal;
       document.getElementById('loanDisbursed').value = loan.disbursed || '';
       document.getElementById('loanUpfrontFees').value = loan.upfrontFees || 0;
+      document.getElementById('loanFeeType').value = loan.feeType || 'DEDUCTED_FROM_LOAN';
       document.getElementById('loanInterestType').value = loan.interestType || 'REDUCING';
       document.getElementById('loanRate').value = loan.rate;
       document.getElementById('loanTenure').value = loan.tenure;
@@ -1833,6 +1859,7 @@
       const principal = parseFloat(document.getElementById('loanPrincipal').value);
       const disbursed = parseFloat(document.getElementById('loanDisbursed').value) || principal;
       let upfrontFees = parseFloat(document.getElementById('loanUpfrontFees').value);
+      const feeType = document.getElementById('loanFeeType').value;
       const paidCount = parseInt(document.getElementById('loanPaidCount').value) || 0;
 
       if (isNaN(upfrontFees)) {
@@ -1846,6 +1873,7 @@
         principal: principal,
         disbursed: disbursed,
         upfrontFees: upfrontFees,
+        feeType: feeType,
         interestType: document.getElementById('loanInterestType').value,
         rate: parseFloat(document.getElementById('loanRate').value),
         tenure: parseInt(document.getElementById('loanTenure').value),

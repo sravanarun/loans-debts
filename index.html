@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -196,6 +197,9 @@
         <button onclick="switchTab('cards')" id="tab-cards" class="tab-btn px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white shadow-sm flex items-center gap-2 whitespace-nowrap">
           <i class="fa-solid fa-table-cells-large"></i> Cards View
         </button>
+        <button onclick="switchTab('monthly')" id="tab-monthly" class="tab-btn px-3.5 py-1.5 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 whitespace-nowrap">
+          <i class="fa-solid fa-calendar-check text-indigo-500"></i> Monthly Planner
+        </button>
         <button onclick="switchTab('table')" id="tab-table" class="tab-btn px-3.5 py-1.5 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 whitespace-nowrap">
           <i class="fa-solid fa-table-list"></i> Detailed Table
         </button>
@@ -227,6 +231,100 @@
     <!-- VIEW 1: Cards View -->
     <div id="view-cards" class="view-panel grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       <!-- Dynamic Loan Cards Injected Here -->
+    </div>
+
+    <!-- VIEW: Monthly Planner / Due Tracker -->
+    <div id="view-monthly" class="view-panel hidden space-y-5">
+      <!-- Monthly Header & Selector -->
+      <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="font-extrabold text-base text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fa-solid fa-calendar-check text-indigo-600"></i> Monthly EMI & Cashflow Planner
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Select any month to verify upcoming vs paid installments and know your exact pending outflow.</p>
+          </div>
+
+          <!-- Month Selector Controls -->
+          <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-900/80 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 self-start sm:self-auto">
+            <button onclick="navigateMonth(-1)" class="w-8 h-8 rounded-xl flex items-center justify-center hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-sm transition" title="Previous Month">
+              <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+            <div class="flex items-center gap-1.5 px-2">
+              <select id="monthlyPickerMonth" onchange="onMonthPickerChange()" class="text-xs font-bold bg-transparent text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer">
+                <option value="0">January</option>
+                <option value="1">February</option>
+                <option value="2">March</option>
+                <option value="3">April</option>
+                <option value="4">May</option>
+                <option value="5">June</option>
+                <option value="6">July</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">October</option>
+                <option value="10">November</option>
+                <option value="11">December</option>
+              </select>
+              <select id="monthlyPickerYear" onchange="onMonthPickerChange()" class="text-xs font-bold bg-transparent text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+            <button onclick="navigateMonth(1)" class="w-8 h-8 rounded-xl flex items-center justify-center hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-sm transition" title="Next Month">
+              <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+            <button onclick="resetToCurrentMonth()" class="text-[11px] font-bold px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition">
+              Current
+            </button>
+          </div>
+        </div>
+
+        <!-- Month Summary Metric Badges -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+          <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-750">
+            <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Total Scheduled Due</span>
+            <div id="monthKpiTotal" class="text-xl font-black text-slate-900 dark:text-white mt-1">₹0</div>
+            <div id="monthKpiCount" class="text-[10px] text-slate-500 mt-0.5">0 installments</div>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40">
+            <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">Paid So Far</span>
+            <div id="monthKpiPaid" class="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">₹0</div>
+            <div id="monthKpiPaidCount" class="text-[10px] text-emerald-700/70 dark:text-emerald-400/70 mt-0.5">0 installments cleared</div>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-900/40">
+            <span class="text-[11px] font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wider block">Remaining Pending</span>
+            <div id="monthKpiPending" class="text-xl font-black text-rose-600 dark:text-rose-400 mt-1">₹0</div>
+            <div id="monthKpiPendingCount" class="text-[10px] text-rose-700/70 dark:text-rose-400/70 mt-0.5">0 installments remaining</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending EMIs Section -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <h4 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+            Pending Payments For This Month
+          </h4>
+          <span id="pendingMonthBadge" class="text-xs font-bold text-rose-600 dark:text-rose-400">0 Pending</span>
+        </div>
+        <div id="monthlyPendingList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Dynamically populated pending cards -->
+        </div>
+      </div>
+
+      <!-- Cleared / Paid Section -->
+      <div class="space-y-3 pt-3">
+        <div class="flex items-center justify-between px-1">
+          <h4 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-500"></i>
+            Already Paid For This Month
+          </h4>
+          <span id="paidMonthBadge" class="text-xs font-bold text-emerald-600 dark:text-emerald-400">0 Paid</span>
+        </div>
+        <div id="monthlyPaidList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Dynamically populated completed cards -->
+        </div>
+      </div>
     </div>
 
     <!-- VIEW 2: Detailed Table View -->
@@ -729,6 +827,9 @@
     let currentActiveTab = 'cards';
     let activeLedgerLoanId = null;
 
+    // Selected Month & Year for Monthly Planner (Defaults to current)
+    let selectedMonthlyDate = new Date();
+
     // Charts instances
     let chartLenderInstance = null;
     let chartCostInstance = null;
@@ -821,6 +922,7 @@
     window.onload = function () {
       initTheme();
       loadStoredData();
+      initMonthPicker();
       renderApp();
 
       // Set default date in modal to today
@@ -831,15 +933,42 @@
       if (prepayEl) prepayEl.value = today;
     };
 
-    // Dark Mode Toggle
-    function initTheme() {
-      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        document.getElementById('themeIcon').className = 'fa-solid fa-sun';
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.getElementById('themeIcon').className = 'fa-solid fa-moon';
+    // Month Picker Setup
+    function initMonthPicker() {
+      const yearSelect = document.getElementById('monthlyPickerYear');
+      if (!yearSelect) return;
+      const currentYear = new Date().getFullYear();
+      yearSelect.innerHTML = '';
+      for (let y = currentYear - 3; y <= currentYear + 5; y++) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        if (y === selectedMonthlyDate.getFullYear()) opt.selected = true;
+        yearSelect.appendChild(opt);
       }
+      document.getElementById('monthlyPickerMonth').value = selectedMonthlyDate.getMonth();
+    }
+
+    function onMonthPickerChange() {
+      const m = parseInt(document.getElementById('monthlyPickerMonth').value);
+      const y = parseInt(document.getElementById('monthlyPickerYear').value);
+      selectedMonthlyDate = new Date(y, m, 1);
+      renderMonthlyPlanner();
+    }
+
+    function navigateMonth(direction) {
+      selectedMonthlyDate.setMonth(selectedMonthlyDate.getMonth() + direction);
+      document.getElementById('monthlyPickerMonth').value = selectedMonthlyDate.getMonth();
+      document.getElementById('monthlyPickerYear').value = selectedMonthlyDate.getFullYear();
+      renderMonthlyPlanner();
+    }
+
+    function resetToCurrentMonth() {
+      selectedMonthlyDate = new Date();
+      document.getElementById('monthlyPickerMonth').value = selectedMonthlyDate.getMonth();
+      document.getElementById('monthlyPickerYear').value = selectedMonthlyDate.getFullYear();
+      renderMonthlyPlanner();
+    }
     }
 
     function toggleDarkMode() {
@@ -1195,7 +1324,7 @@
       const emptyState = document.getElementById('emptyState');
       const cardsView = document.getElementById('view-cards');
 
-      if (filteredLoans.length === 0 && currentActiveTab !== 'closed') {
+      if (filteredLoans.length === 0 && currentActiveTab !== 'closed' && currentActiveTab !== 'monthly') {
         emptyState.classList.remove('hidden');
         cardsView.innerHTML = '';
         document.getElementById('loanTableBody').innerHTML = '';
@@ -1206,8 +1335,9 @@
         renderCalendarView(filteredLoans);
       }
 
-      // Always update closed loans archive
+      // Always update closed loans archive & monthly planner
       renderClosedLoansArchive();
+      renderMonthlyPlanner();
 
       if (currentActiveTab === 'analytics') {
         renderAnalyticsCharts();
@@ -1398,6 +1528,177 @@
 
       document.getElementById('closedTotalRepaid').textContent = formatMoney(totalSettledPrincipal);
       document.getElementById('closedTotalCost').textContent = formatMoney(totalSunkCostClosed);
+    }
+
+    // Render: Dedicated Monthly Planner View
+    function renderMonthlyPlanner() {
+      const targetYear = selectedMonthlyDate.getFullYear();
+      const targetMonth = selectedMonthlyDate.getMonth();
+
+      let scheduledItems = [];
+      let totalDue = 0;
+      let totalPaid = 0;
+      let totalPending = 0;
+
+      loans.forEach(loan => {
+        const stats = calculateLoanAmortization(loan);
+        stats.schedule.forEach(item => {
+          const itemDate = new Date(item.dueDate);
+          if (itemDate.getFullYear() === targetYear && itemDate.getMonth() === targetMonth) {
+            scheduledItems.push({
+              loan: loan,
+              item: item,
+              isClosedLoan: (loan.status === 'CLOSED' || loan.status === 'FORECLOSED')
+            });
+
+            totalDue += item.emi;
+            if (item.isPaid) {
+              totalPaid += item.emi;
+            } else {
+              totalPending += item.emi;
+            }
+          }
+        });
+      });
+
+      // Update KPI Badges for Selected Month
+      document.getElementById('monthKpiTotal').textContent = formatMoney(totalDue);
+      document.getElementById('monthKpiCount').textContent = `${scheduledItems.length} installment(s) scheduled`;
+      
+      document.getElementById('monthKpiPaid').textContent = formatMoney(totalPaid);
+      const paidItemsCount = scheduledItems.filter(x => x.item.isPaid).length;
+      document.getElementById('monthKpiPaidCount').textContent = `${paidItemsCount} cleared (${totalDue > 0 ? Math.round((totalPaid / totalDue) * 100) : 0}%)`;
+
+      document.getElementById('monthKpiPending').textContent = formatMoney(totalPending);
+      const pendingItemsCount = scheduledItems.length - paidItemsCount;
+      document.getElementById('monthKpiPendingCount').textContent = `${pendingItemsCount} remaining to pay`;
+
+      document.getElementById('pendingMonthBadge').textContent = `${pendingItemsCount} Pending (${formatMoney(totalPending)})`;
+      document.getElementById('paidMonthBadge').textContent = `${paidItemsCount} Paid (${formatMoney(totalPaid)})`;
+
+      // Render Pending List
+      const pendingContainer = document.getElementById('monthlyPendingList');
+      const paidContainer = document.getElementById('monthlyPaidList');
+      pendingContainer.innerHTML = '';
+      paidContainer.innerHTML = '';
+
+      const pendingList = scheduledItems.filter(x => !x.item.isPaid);
+      const paidList = scheduledItems.filter(x => x.item.isPaid);
+
+      if (pendingList.length === 0) {
+        pendingContainer.innerHTML = `
+          <div class="col-span-full p-6 text-center text-slate-400 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+            <i class="fa-solid fa-circle-check text-2xl text-emerald-500 mb-1.5 block"></i>
+            <span class="text-xs font-semibold">All done! No pending payments remaining for this month.</span>
+          </div>
+        `;
+      } else {
+        pendingList.forEach(entry => {
+          const card = document.createElement('div');
+          card.className = 'bg-white dark:bg-slate-800 p-4 rounded-2xl border border-rose-200 dark:border-rose-900/50 shadow-sm space-y-3';
+          card.innerHTML = `
+            <div class="flex items-start justify-between">
+              <div>
+                <h4 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                  ${escapeHtml(entry.loan.lender)}
+                </h4>
+                <div class="text-[10px] text-slate-400 font-mono mt-0.5">${escapeHtml(entry.loan.ref || 'Direct App')}</div>
+              </div>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900">
+                Due: ${entry.item.dueDate}
+              </span>
+            </div>
+
+            <div class="flex items-baseline justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+              <div>
+                <span class="text-[10px] text-slate-400 uppercase font-semibold">Monthly EMI</span>
+                <div class="text-base font-extrabold text-slate-900 dark:text-white">${formatMoney(entry.item.emi)}</div>
+              </div>
+              <div class="text-right text-[11px] text-slate-500 font-medium">
+                <div>Principal: <strong class="text-indigo-600 dark:text-indigo-400">${formatMoney(entry.item.principalPart)}</strong></div>
+                <div>Interest: <strong class="text-violet-600 dark:text-violet-400">${formatMoney(entry.item.interest)}</strong></div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-[11px] text-slate-400">Installment #${entry.item.installmentNo} of ${entry.loan.tenure}</span>
+              <button onclick="markInstallmentForMonth('${entry.loan.id}', ${entry.item.installmentNo}, true)" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition active:scale-95 flex items-center gap-1.5">
+                <i class="fa-solid fa-check"></i> Mark as Paid
+              </button>
+            </div>
+          `;
+          pendingContainer.appendChild(card);
+        });
+      }
+
+      if (paidList.length === 0) {
+        paidContainer.innerHTML = `
+          <div class="col-span-full p-4 text-center text-slate-400 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 text-xs">
+            No payments recorded as paid yet for this month.
+          </div>
+        `;
+      } else {
+        paidList.forEach(entry => {
+          const card = document.createElement('div');
+          card.className = 'bg-white dark:bg-slate-800 p-4 rounded-2xl border border-emerald-200/80 dark:border-emerald-900/50 shadow-sm space-y-3';
+          card.innerHTML = `
+            <div class="flex items-start justify-between">
+              <div>
+                <h4 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
+                  ${escapeHtml(entry.loan.lender)}
+                </h4>
+                <div class="text-[10px] text-slate-400 font-mono mt-0.5">${escapeHtml(entry.loan.ref || 'Direct App')}</div>
+              </div>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900">
+                Cleared: ${entry.item.dueDate}
+              </span>
+            </div>
+
+            <div class="flex items-baseline justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+              <div>
+                <span class="text-[10px] text-slate-400 uppercase font-semibold">Amount Paid</span>
+                <div class="text-base font-extrabold text-emerald-600 dark:text-emerald-400">${formatMoney(entry.item.emi)}</div>
+              </div>
+              <div class="text-right text-[11px] text-slate-500 font-medium">
+                <div>Principal: <strong class="text-indigo-600 dark:text-indigo-400">${formatMoney(entry.item.principalPart)}</strong></div>
+                <div>Interest: <strong class="text-violet-600 dark:text-violet-400">${formatMoney(entry.item.interest)}</strong></div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-[11px] text-slate-400">Installment #${entry.item.installmentNo} of ${entry.loan.tenure}</span>
+              <button onclick="markInstallmentForMonth('${entry.loan.id}', ${entry.item.installmentNo}, false)" class="text-[11px] font-semibold text-slate-400 hover:text-rose-500 underline transition">
+                Undo / Mark Unpaid
+              </button>
+            </div>
+          `;
+          paidContainer.appendChild(card);
+        });
+      }
+    }
+
+    function markInstallmentForMonth(loanId, installmentNo, isPaid) {
+      const loan = loans.find(l => l.id === loanId);
+      if (!loan) return;
+
+      if (isPaid) {
+        loan.paidInstallments = Math.max(loan.paidInstallments || 0, installmentNo);
+        if (loan.paidInstallments >= loan.tenure) {
+          loan.status = 'CLOSED';
+        }
+        showToast(`Paid installment #${installmentNo} for ${loan.lender}`, 'circle-check');
+      } else {
+        loan.paidInstallments = Math.max(0, installmentNo - 1);
+        if (loan.status === 'CLOSED') {
+          loan.status = 'ACTIVE';
+        }
+        showToast(`Unmarked installment #${installmentNo} for ${loan.lender}`, 'arrow-rotate-left');
+      }
+
+      saveData();
+      renderApp();
     }
 
     // Settling / Closing Modal Logic
@@ -2084,6 +2385,8 @@
 
       if (tabId === 'analytics') {
         renderAnalyticsCharts();
+      } else if (tabId === 'monthly') {
+        renderMonthlyPlanner();
       }
     }
 
@@ -2115,3 +2418,4 @@
   </script>
 </body>
 </html>
+```

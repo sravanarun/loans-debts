@@ -76,12 +76,6 @@
             </select>
           </div>
 
-          <!-- Sample Data Button -->
-          <button onclick="loadSampleData()" title="Pre-populate real-world multi-app loans" class="text-xs font-medium py-1.5 px-3 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition flex items-center gap-1.5">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <span class="hidden md:inline">Demo Data</span>
-          </button>
-
           <!-- Export / Import Dropdown -->
           <div class="relative group">
             <button class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs flex items-center gap-1.5" title="Data Backup & Export">
@@ -439,9 +433,6 @@
       <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-1">No Loans Found</h3>
       <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-5">Start tracking your personal loans, BNPLs, and micro-credits from Pocketly, KreditBee, Snapmint, or banks.</p>
       <div class="flex items-center justify-center gap-3">
-        <button onclick="loadSampleData()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
-          Load Sample Loans
-        </button>
         <button onclick="openLoanModal()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">
           + Add First Loan
         </button>
@@ -833,88 +824,29 @@
     let chartLenderInstance = null;
     let chartCostInstance = null;
     let chartTrajectoryInstance = null;
-    // Sample Data representing popular apps
-    const SAMPLE_LOANS = [
-      {
-        id: 'sample-1',
-        lender: 'Pocketly',
-        ref: 'PKT-882910',
-        principal: 10000,
-        disbursed: 8850,
-        upfrontFees: 1150,
-        interestType: 'FLAT',
-        rate: 24,
-        tenure: 3,
-        emi: 3533,
-        dueDay: 5,
-        startDate: getRelativeDateString(-75),
-        notes: 'Micro cash advance for shopping',
-        status: 'CLOSED',
-        closedDate: getRelativeDateString(-15),
-        prepayments: 0,
-        paidInstallments: 3
-      },
-      {
-        id: 'sample-2',
-        lender: 'KreditBee',
-        ref: 'KB-Personal-4412',
-        principal: 60000,
-        disbursed: 56460,
-        upfrontFees: 3540,
-        interestType: 'REDUCING',
-        rate: 22,
-        tenure: 9,
-        emi: 7298,
-        dueDay: 10,
-        startDate: getRelativeDateString(-70),
-        notes: 'Two-wheeler maintenance & repairs',
-        status: 'ACTIVE',
-        prepayments: 5000,
-        paidInstallments: 2
-      },
-      {
-        id: 'sample-3',
-        lender: 'Snapmint (PayLater)',
-        ref: 'SNAP-EMI-9901',
-        principal: 18000,
-        disbursed: 17200,
-        upfrontFees: 800,
-        interestType: 'FLAT',
-        rate: 18,
-        tenure: 6,
-        emi: 3270,
-        dueDay: 18,
-        startDate: getRelativeDateString(-20),
-        notes: 'Electronics gadget purchase EMI',
-        status: 'ACTIVE',
-        prepayments: 0,
-        paidInstallments: 0
-      },
-      {
-        id: 'sample-4',
-        lender: 'HDFC Bank Personal Loan',
-        ref: 'HDFC-PL-0098231',
-        principal: 250000,
-        disbursed: 244100,
-        upfrontFees: 5900,
-        interestType: 'REDUCING',
-        rate: 11.75,
-        tenure: 24,
-        emi: 11739,
-        dueDay: 2,
-        startDate: getRelativeDateString(-190),
-        notes: 'Home renovation work',
-        status: 'ACTIVE',
-        prepayments: 25000,
-        paidInstallments: 6
-      }
-    ];
 
     // Helper to generate dynamic dates
     function getRelativeDateString(daysOffset) {
       const d = new Date();
       d.setDate(d.getDate() + daysOffset);
       return d.toISOString().split('T')[0];
+    }
+    
+    // Formatting exact date like "5th Nov"
+    function formatShortDate(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const d = new Date(year, month, day);
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      let suffix = 'th';
+      if (day % 10 === 1 && day !== 11) suffix = 'st';
+      else if (day % 10 === 2 && day !== 12) suffix = 'nd';
+      else if (day % 10 === 3 && day !== 13) suffix = 'rd';
+      return `${day}${suffix} ${months[d.getMonth()]}`;
     }
 
     // App Initialization
@@ -978,6 +910,18 @@
       }
     }
 
+    function initTheme() {
+      const storedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('themeIcon').className = 'fa-solid fa-moon';
+      }
+    }
+
     // Currency Switcher
     function changeCurrency(val) {
       currentCurrency = val;
@@ -1000,9 +944,7 @@
         if (stored) {
           loans = JSON.parse(stored);
         } else {
-          // Pre-populate with realistic sample loans for immediate usefulness
-          loans = SAMPLE_LOANS;
-          saveData();
+          loans = [];
         }
       } catch (e) {
         console.error('Failed to load local loans', e);
@@ -1016,13 +958,6 @@
       } catch (e) {
         console.error('Storage error', e);
       }
-    }
-
-    function loadSampleData() {
-      loans = JSON.parse(JSON.stringify(SAMPLE_LOANS));
-      saveData();
-      renderApp();
-      showToast('Loaded demo loans from Pocketly, KreditBee, Snapmint, etc.', 'check');
     }
 
     function clearAllData() {
@@ -1181,15 +1116,11 @@
       }
 
       // Real Outflow / Cost calculation:
-      // If fee was deducted from the principal (In hand = 34k, fee = 6k, loan = 40k), 
-      // the borrower repays the 40k principal + interest. Adding fee AGAIN would result in 46k (Double counting!).
-      // If fee was paid out-of-pocket / down payment over and above the loan, it is added.
       const relevantInterest = isClosed ? interestPaidSoFar : totalInterest;
       let realTotalCost = 0;
       if (feeType === 'PAID_OUT_OF_POCKET') {
         realTotalCost = principal + relevantInterest + upfrontFees;
       } else {
-        // Deducted from loan: Principal already includes the deducted amount
         realTotalCost = principal + relevantInterest;
       }
 
@@ -1260,10 +1191,8 @@
       let totalUpfrontChargesLifetime = 0;
       let totalRealBorrowCostLifetime = 0;
       let totalMonthlyEMI = 0;
-      let nextDueSummary = null;
-
-      const today = new Date();
-      const currentDay = today.getDate();
+      
+      let upcomingEMIs = [];
 
       loans.forEach(loan => {
         const stats = calculateLoanAmortization(loan);
@@ -1283,16 +1212,16 @@
           totalOutstanding += stats.remainingBalance;
           totalMonthlyEMI += Number(loan.emi) || 0;
 
-          // Check upcoming due day
-          const day = parseInt(loan.dueDay) || 1;
-          const diff = day >= currentDay ? (day - currentDay) : (30 - currentDay + day);
-          if (!nextDueSummary || diff < nextDueSummary.diff) {
-            nextDueSummary = {
-              lender: loan.lender,
-              day: day,
-              diff: diff,
-              emi: loan.emi
-            };
+          // Check exact pending EMI Date for KPI
+          const nextPending = stats.schedule.find(s => !s.isPaid);
+          if (nextPending) {
+             const parts = nextPending.dueDate.split('-');
+             upcomingEMIs.push({
+                 lender: loan.lender,
+                 dateStr: nextPending.dueDate,
+                 dateObj: new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2])),
+                 emi: nextPending.emi
+             });
           }
         }
       });
@@ -1304,11 +1233,13 @@
       document.getElementById('kpiPrincipalRepaid').textContent = `${formatMoney(totalPrincipalPaid)} principal cleared`;
       document.getElementById('kpiMonthlyEMI').textContent = formatMoney(totalMonthlyEMI);
 
-      if (nextDueSummary) {
-        document.getElementById('kpiNextDueDate').textContent = `Next: ${nextDueSummary.lender} on ${nextDueSummary.day}th (${formatMoney(nextDueSummary.emi)})`;
-      } else {
-        document.getElementById('kpiNextDueDate').textContent = `No active EMIs pending`;
+      let nextDueSummaryStr = `No active EMIs pending`;
+      if (upcomingEMIs.length > 0) {
+          upcomingEMIs.sort((a, b) => a.dateObj - b.dateObj);
+          const nextEMI = upcomingEMIs[0];
+          nextDueSummaryStr = `Next: ${nextEMI.lender} on ${formatShortDate(nextEMI.dateStr)} (${formatMoney(nextEMI.emi)})`;
       }
+      document.getElementById('kpiNextDueDate').textContent = nextDueSummaryStr;
 
       // Sunk costs: never drops when loans close!
       document.getElementById('kpiInterestPaid').textContent = formatMoney(totalInterestPaidLifetime);
@@ -1351,6 +1282,13 @@
         const stats = calculateLoanAmortization(loan);
         const percentPaid = Math.min(100, Math.round((stats.principalRepaid / loan.principal) * 100));
         const isClosed = loan.status === 'CLOSED' || loan.status === 'FORECLOSED';
+        
+        // Formatted specific Due Date checking
+        const nextPending = !isClosed ? stats.schedule.find(s => !s.isPaid) : null;
+        const dueText = isClosed 
+            ? (loan.closedDate ? `Closed: ${formatShortDate(loan.closedDate)}` : 'Archived')
+            : (nextPending ? `Due: ${formatShortDate(nextPending.dueDate)}` : `All EMIs Paid`);
+        const dueColorClass = (isClosed || !nextPending) ? 'text-emerald-600 font-semibold' : 'text-amber-600 dark:text-amber-400 font-semibold';
 
         const card = document.createElement('div');
         card.className = `bg-white dark:bg-slate-800 rounded-3xl p-5 border ${isClosed ? 'border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/10' : 'border-slate-200/90 dark:border-slate-750'} shadow-sm hover:shadow-md transition relative flex flex-col justify-between`;
@@ -1387,8 +1325,8 @@
               <div class="text-right">
                 <div class="text-[10px] uppercase font-semibold text-slate-400">${isClosed ? 'Status' : 'Monthly EMI'}</div>
                 <div class="text-base font-extrabold text-indigo-600 dark:text-indigo-400 mt-0.5">${isClosed ? 'Fully Paid' : formatMoney(loan.emi)}</div>
-                <div class="text-[10px] ${isClosed ? 'text-emerald-600 font-semibold' : 'text-amber-600 dark:text-amber-400 font-semibold'}">
-                  ${isClosed ? (loan.closedDate ? `Closed: ${loan.closedDate}` : 'Archived') : `Due: ${loan.dueDay}th of month`}
+                <div class="text-[10px] ${dueColorClass}">
+                  ${dueText}
                 </div>
               </div>
             </div>
@@ -1649,7 +1587,7 @@
                 </h4>
                 <div class="text-[10px] text-slate-400 font-mono mt-0.5">${escapeHtml(entry.loan.ref || 'Direct App')}</div>
               </div>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900">
                 Cleared: ${entry.item.dueDate}
               </span>
             </div>
@@ -2259,7 +2197,7 @@
 
         tr.innerHTML = `
           <td class="py-2.5 px-3 font-mono font-bold">${row.installmentNo}</td>
-          <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300">${row.dueDate}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300">${formatShortDate(row.dueDate)}</td>
           <td class="py-2.5 px-3 font-bold text-slate-900 dark:text-white">${formatMoney(row.emi)}</td>
           <td class="py-2.5 px-3 text-indigo-600 dark:text-indigo-400 font-semibold">${formatMoney(row.principalPart)}</td>
           <td class="py-2.5 px-3 text-violet-600 dark:text-violet-400 font-semibold">${formatMoney(row.interest)}</td>

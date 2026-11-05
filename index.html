@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -969,7 +968,6 @@
       document.getElementById('monthlyPickerYear').value = selectedMonthlyDate.getFullYear();
       renderMonthlyPlanner();
     }
-    }
 
     function toggleDarkMode() {
       const isDark = document.documentElement.classList.toggle('dark');
@@ -1651,7 +1649,7 @@
                 </h4>
                 <div class="text-[10px] text-slate-400 font-mono mt-0.5">${escapeHtml(entry.loan.ref || 'Direct App')}</div>
               </div>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900">
                 Cleared: ${entry.item.dueDate}
               </span>
             </div>
@@ -2418,4 +2416,3 @@
   </script>
 </body>
 </html>
-```
